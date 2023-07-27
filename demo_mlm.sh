@@ -12,5 +12,5 @@ conda activate kiddothe2b
 echo $SLURMD_NODENAME
 echo $CUDA_VISIBLE_DEVICES
 
-python demo_flashroberta.py --model_class roberta
-python demo_flashroberta.py --model_class flashroberta
+python demo_mlm.py --model_class roberta
+python demo_mlm.py --model_class flashroberta

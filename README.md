@@ -6,5 +6,13 @@ Re-implementation of Hugging Face :hugs: [RoBERTa](https://arxiv.org/abs/1907.11
 
 ```bash
 pip install -r requirements.txt
-sh test.sh
+sh demo_mlm.sh
+```
+
+You can use any RoBERTa model from Hugging Face model hub and evaluate on any corpus. For example, to use `roberta-base` on `SST-2`:
+
+```bash
+python demo_mlm.py --model_class roberta --model_path roberta-base --dataset_name sst2
+python demo_mlm.py --model_class flash-roberta --model_path roberta-base --dataset_name sst2
+
 ```
