@@ -4,7 +4,7 @@ from flash_attn import flash_attn_func
 import torch.nn as nn
 import torch
 from typing import Optional, Tuple
-import math
+
 
 # Copied from transformers.models.roberta.modeling_roberta.RobertaSelfAttention with Roberta->FlashRoberta
 class FlashRobertaSelfAttention(nn.Module):
@@ -24,16 +24,7 @@ class FlashRobertaSelfAttention(nn.Module):
         self.key = nn.Linear(config.hidden_size, self.all_head_size)
         self.value = nn.Linear(config.hidden_size, self.all_head_size)
 
-        # self.dropout = nn.Dropout(config.attention_probs_dropout_prob)
         self.dropout_rate = config.attention_probs_dropout_prob
-        self.position_embedding_type = position_embedding_type or getattr(
-            config, "position_embedding_type", "absolute"
-        )
-        if self.position_embedding_type == "relative_key" or self.position_embedding_type == "relative_key_query":
-            self.max_position_embeddings = config.max_position_embeddings
-            self.distance_embedding = nn.Embedding(2 * config.max_position_embeddings - 1, self.attention_head_size)
-
-        self.is_decoder = config.is_decoder
 
     def transpose_for_scores(self, x: torch.Tensor) -> torch.Tensor:
         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
@@ -75,21 +66,16 @@ class FlashRobertaModel(RobertaModel):
     """
 
     The model can behave as an encoder (with only self-attention) as well as a decoder, in which case a layer of
-    cross-attention is added between the self-attention layers, following the architecture described in *Attention is
-    all you need*_ by Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz
-    Kaiser and Illia Polosukhin.
+    cross-attention is added between the self-attention layers, following the architecture described in
+    *FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning* by Tri Dao
 
-    To behave as an decoder the model needs to be initialized with the `is_decoder` argument of the configuration set
-    to `True`. To be used in a Seq2Seq model, the model needs to initialized with both `is_decoder` argument and
-    `add_cross_attention` set to `True`; an `encoder_hidden_states` is then expected as an input to the forward pass.
-
-    .. _*Attention is all you need*: https://arxiv.org/abs/1706.03762
+    .. _*FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning*: https://tridao.me/publications/flash2/flash2.pdf
 
     """
 
     _keys_to_ignore_on_load_missing = [r"position_ids"]
 
-    # Copied from transformers.models.bert.modeling_bert.BertModel.__init__ with Bert->Roberta
+    # Copied from transformers.models.roberta.modeling_roberta.RobertaModel.__init__ with Roberta->FlashRoberta
     def __init__(self, config, add_pooling_layer=True):
         super().__init__(config)
 

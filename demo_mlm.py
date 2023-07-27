@@ -25,7 +25,7 @@ def demo_mlm(corpus,
     mask_token_id = torch.tensor(tokenizer.mask_token_id).to(device)
     if model_class == 'roberta':
         model = RobertaForMaskedLM.from_pretrained(model_path).to(device)
-    elif model_class == 'flashroberta':
+    elif model_class == 'flash-roberta':
         model = FlashRobertaForMaskedLM.from_pretrained(model_path).to(device)
 
     # Set the model to evaluation mode (important for inference)
