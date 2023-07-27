@@ -70,7 +70,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Example script with argparse")
     parser.add_argument("--model_class", type=str, default="roberta", help="Model class to use")
     parser.add_argument("--dataset_name", type=str, default="c4", help="Dataset to use")
-    parser.add_argument("--dataset_config", type=str, default="3n", help="Dataset config to use")
+    parser.add_argument("--dataset_config", type=str, default="en", help="Dataset config to use")
 
     args = parser.parse_args()
 
