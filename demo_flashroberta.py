@@ -9,7 +9,7 @@ import re
 import random
 
 
-def demo_mlm(corpus, model_class: str = 'roberta', log_predictions: bool = False):
+def demo_mlm(corpus, model_class: str = 'roberta', n_samples: int = 1000, log_predictions: bool = False):
 
     # Check if you have a GPU with CUDA support
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -49,7 +49,7 @@ def demo_mlm(corpus, model_class: str = 'roberta', log_predictions: bool = False
     end_time = time.time() - current_time
     print(f'Model: {model.__class__.__name__}')
     print(f'Time taken for {model.__class__.__name__}: {end_time}')
-    print(f'Recall@5 for {model.__class__.__name__}: {correct_predictions / len(corpus)}')
+    print(f'Recall@5 for {model.__class__.__name__}: {correct_predictions / n_samples}')
 
 
 def mask_random_words(document):
@@ -71,12 +71,13 @@ if __name__ == "__main__":
     parser.add_argument("--model_class", type=str, default="roberta", help="Model class to use")
     parser.add_argument("--dataset_name", type=str, default="c4", help="Dataset to use")
     parser.add_argument("--dataset_config", type=str, default="en", help="Dataset config to use")
+    parser.add_argument("--n_samples", type=int, default=1000, help="Number of samples to use")
 
     args = parser.parse_args()
 
     # Load C4 dataset, take 1000 samples, and mask random words
     c4_dataset = load_dataset(args.dataset_name, args.dataset_config, split="train", streaming=True)
-    c4_subset = c4_dataset.take(1000)
+    c4_subset = c4_dataset.take(args.n_samples)
     c4_subset = c4_subset.map(mask_random_words)
 
-    demo_mlm(c4_subset, args.model_class)
+    demo_mlm(c4_subset, args.model_class, args.n_samples)
