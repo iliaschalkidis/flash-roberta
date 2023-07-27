@@ -13,4 +13,5 @@ echo $SLURMD_NODENAME
 echo $CUDA_VISIBLE_DEVICES
 
 python demo_mlm.py --model_class roberta
+echo "----------------------------------------"
 python demo_mlm.py --model_class flashroberta
