@@ -87,6 +87,7 @@ if __name__ == "__main__":
     # Load C4 dataset, take 1000 samples, and mask random words
     c4_dataset = load_dataset(args.dataset_name, args.dataset_config, split="train", streaming=True)
     c4_subset = c4_dataset.take(args.n_samples)
+    c4_subset = c4_subset.filter(lambda x: 256 > len(x['text'].split()) > 64)
     c4_subset = c4_subset.map(mask_random_words)
 
     # Pre-encode C4 dataset
@@ -95,7 +96,6 @@ if __name__ == "__main__":
     precompiled_c4_subset = []
     for document in c4_subset:
         input_doc = tokenizer.encode(document['text'], return_tensors="pt", truncation=True).to(device)
-        if len(input_doc['input_ids'][0]):
-            precompiled_c4_subset.append(input_doc)
+        precompiled_c4_subset.append(input_doc)
 
     demo_mlm(precompiled_c4_subset, args.model_class, args.model_path, len(precompiled_c4_subset))
