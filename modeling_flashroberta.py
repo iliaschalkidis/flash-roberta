@@ -49,32 +49,34 @@ class FlashRobertaSelfAttention(nn.Module):
         past_key_value: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
         output_attentions: Optional[bool] = False,
     ) -> Tuple[torch.Tensor]:
-        mixed_query_layer = self.query(hidden_states)
+        # mixed_query_layer = self.query(hidden_states)
 
         # If this is instantiated as a cross-attention module, the keys
         # and values come from an encoder; the attention mask needs to be
         # such that the encoder's padding tokens are not attended to.
         is_cross_attention = encoder_hidden_states is not None
 
-        if is_cross_attention and past_key_value is not None:
-            # reuse k,v, cross_attentions
-            key_layer = past_key_value[0]
-            value_layer = past_key_value[1]
-            attention_mask = encoder_attention_mask
-        elif is_cross_attention:
-            key_layer = self.transpose_for_scores(self.key(encoder_hidden_states))
-            value_layer = self.transpose_for_scores(self.value(encoder_hidden_states))
-            attention_mask = encoder_attention_mask
-        elif past_key_value is not None:
-            key_layer = self.transpose_for_scores(self.key(hidden_states))
-            value_layer = self.transpose_for_scores(self.value(hidden_states))
-            key_layer = torch.cat([past_key_value[0], key_layer], dim=2)
-            value_layer = torch.cat([past_key_value[1], value_layer], dim=2)
-        else:
-            key_layer = self.transpose_for_scores(self.key(hidden_states))
-            value_layer = self.transpose_for_scores(self.value(hidden_states))
-
-        query_layer = self.transpose_for_scores(mixed_query_layer)
+        # if is_cross_attention and past_key_value is not None:
+        #     # reuse k,v, cross_attentions
+        #     key_layer = past_key_value[0]
+        #     value_layer = past_key_value[1]
+        #     attention_mask = encoder_attention_mask
+        # elif is_cross_attention:
+        #     key_layer = self.transpose_for_scores(self.key(encoder_hidden_states))
+        #     value_layer = self.transpose_for_scores(self.value(encoder_hidden_states))
+        #     attention_mask = encoder_attention_mask
+        # elif past_key_value is not None:
+        #     key_layer = self.transpose_for_scores(self.key(hidden_states))
+        #     value_layer = self.transpose_for_scores(self.value(hidden_states))
+        #     key_layer = torch.cat([past_key_value[0], key_layer], dim=2)
+        #     value_layer = torch.cat([past_key_value[1], value_layer], dim=2)
+        # else:
+        #     key_layer = self.transpose_for_scores(self.key(hidden_states))
+        #     value_layer = self.transpose_for_scores(self.value(hidden_states))
+        #
+        key_layer = self.key(hidden_states).view(-1, hidden_states.size(1), self.num_attention_heads, self.attention_head_size)
+        value_layer = self.value(hidden_states).view(-1, hidden_states.size(1), self.num_attention_heads, self.attention_head_size)
+        query_layer = self.query(hidden_states).view(-1, hidden_states.size(1), self.num_attention_heads, self.attention_head_size)
 
         use_cache = past_key_value is not None
         if self.is_decoder:
