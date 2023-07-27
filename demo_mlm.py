@@ -1,6 +1,6 @@
 import tqdm
 from transformers import RobertaForMaskedLM, AutoTokenizer
-from modeling_flashroberta import FlashRobertaForMaskedLM
+from modeling_flash_roberta import FlashRobertaForMaskedLM
 import torch
 from torch.cuda.amp import autocast
 import argparse

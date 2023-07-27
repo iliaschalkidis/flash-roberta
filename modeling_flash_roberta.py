@@ -1,5 +1,6 @@
 from transformers.models.roberta.modeling_roberta import RobertaModel
-from transformers.models.roberta.modeling_roberta import RobertaForMaskedLM
+from transformers.models.roberta.modeling_roberta import RobertaForMaskedLM, RobertaForSequenceClassification, \
+    RobertaClassificationHead, RobertaForMultipleChoice, RobertaForTokenClassification, RobertaForQuestionAnswering
 from flash_attn import flash_attn_func
 import torch.nn as nn
 import torch
@@ -97,6 +98,54 @@ class FlashRobertaForMaskedLM(RobertaForMaskedLM):
 
         # Replace legacy RobertaModel with FlashRobertaModel
         self.roberta = FlashRobertaModel(config, add_pooling_layer=False)
+
+        # Initialize weights and apply final processing
+        self.post_init()
+
+
+class FlashRobertaForSequenceClassification(RobertaForSequenceClassification):
+    _keys_to_ignore_on_load_missing = [r"position_ids"]
+
+    def __init__(self, config):
+        super().__init__(config)
+        self.num_labels = config.num_labels
+        self.config = config
+
+        self.roberta = FlashRobertaModel(config, add_pooling_layer=False)
+        self.classifier = RobertaClassificationHead(config)
+
+        # Initialize weights and apply final processing
+        self.post_init()
+
+
+class FlashRobertaForMultipleChoice(RobertaForMultipleChoice):
+    _keys_to_ignore_on_load_missing = [r"position_ids"]
+
+    def __init__(self, config):
+        super().__init__(config)
+
+        self.roberta = FlashRobertaModel(config)
+        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        self.classifier = nn.Linear(config.hidden_size, 1)
+
+        # Initialize weights and apply final processing
+        self.post_init()
+
+
+class FlashRobertaForTokenClassification(RobertaForTokenClassification):
+    _keys_to_ignore_on_load_unexpected = [r"pooler"]
+    _keys_to_ignore_on_load_missing = [r"position_ids"]
+
+    def __init__(self, config):
+        super().__init__(config)
+        self.num_labels = config.num_labels
+
+        self.roberta = FlashRobertaModel(config, add_pooling_layer=False)
+        classifier_dropout = (
+            config.classifier_dropout if config.classifier_dropout is not None else config.hidden_dropout_prob
+        )
+        self.dropout = nn.Dropout(classifier_dropout)
+        self.classifier = nn.Linear(config.hidden_size, config.num_labels)
 
         # Initialize weights and apply final processing
         self.post_init()
