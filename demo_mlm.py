@@ -1,3 +1,4 @@
+import tqdm
 from transformers import RobertaForMaskedLM, AutoTokenizer
 from modeling_flashroberta import FlashRobertaForMaskedLM
 import torch
@@ -33,7 +34,7 @@ def demo_mlm(corpus,
     current_time = time.time()
     correct_predictions = 0
     inf_avg_time = []
-    for input_doc in corpus:
+    for input_doc in tqdm.tqdm(corpus, total=n_samples, desc='Running inference...'):
         # Generate the masked language model output
         with autocast():
             mask_token_index = torch.where(input_doc == mask_token_id)[1]
@@ -94,6 +95,7 @@ if __name__ == "__main__":
     precompiled_c4_subset = []
     for document in c4_subset:
         input_doc = tokenizer.encode(document['text'], return_tensors="pt", truncation=True).to(device)
-        precompiled_c4_subset.append(input_doc)
+        if len(input_doc['input_ids']):
+            precompiled_c4_subset.append(input_doc)
 
-    demo_mlm(precompiled_c4_subset, args.model_class, args.model_path, args.n_samples)
+    demo_mlm(precompiled_c4_subset, args.model_class, args.model_path, len(precompiled_c4_subset))
