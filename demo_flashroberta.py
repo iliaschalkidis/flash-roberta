@@ -25,7 +25,7 @@ def demo_mlm(corpus, model_class: str = 'roberta', log_predictions: bool = False
     correct_predictions = 0
     for document in corpus:
 
-        input = tokenizer.encode(document['text'], return_tensors="pt").to(device)
+        input = tokenizer.encode(document['text'], return_tensors="pt", truncation=True).to(device)
 
         # Ensure mask_token_id is of type torch.float16
         mask_token_id = torch.tensor(tokenizer.mask_token_id).to(device)
@@ -57,7 +57,7 @@ def mask_random_words(document):
     words = re.findall(r'\b\w+\b', document['text'])
 
     # Randomly select a word to mask
-    word_to_mask = random.choice(words)
+    word_to_mask = words[random.choice(range(min(200, len(words))))]
 
     # Replace the selected word with the mask token
     document['text'] = document['text'].replace(word_to_mask, "<mask>", 1)
@@ -69,11 +69,13 @@ def mask_random_words(document):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Example script with argparse")
     parser.add_argument("--model_class", type=str, default="roberta", help="Model class to use")
+    parser.add_argument("--dataset_name", type=str, default="c4", help="Dataset to use")
+    parser.add_argument("--dataset_config", type=str, default="3n", help="Dataset config to use")
 
     args = parser.parse_args()
 
     # Load C4 dataset, take 1000 samples, and mask random words
-    c4_dataset = load_dataset("c4", "en", split="train", streaming=True)
+    c4_dataset = load_dataset(args.dataset_name, args.dataset_config, split="train", streaming=True)
     c4_subset = c4_dataset.take(1000)
     c4_subset = c4_subset.map(mask_random_words)
 
