@@ -1,6 +1,7 @@
 from transformers import RobertaForMaskedLM, AutoTokenizer
 from modeling_flashroberta import FlashRobertaForMaskedLM
 import torch
+from torch.cuda.amp import autocast
 import argparse
 
 
@@ -16,23 +17,19 @@ def demo_mlm(model_class: str = 'roberta'):
     elif model_class == 'flashroberta':
         model = FlashRobertaForMaskedLM.from_pretrained('roberta-base').to(device)
 
-    # Set the model to fp16 precision
-    model = model.half()
-
     # Prepare the input sequence
     sequence = f"My favourite pet is a {tokenizer.mask_token}."
     print('Example sequence:', sequence)
-    input = tokenizer.encode(sequence, return_tensors="pt").to(device).half()  # Convert to fp16
+    input = tokenizer.encode(sequence, return_tensors="pt").to(device)
 
     # Ensure mask_token_id is of type torch.float16
-    mask_token_id = torch.tensor(tokenizer.mask_token_id).to(device).half()
+    mask_token_id = torch.tensor(tokenizer.mask_token_id).to(device)
 
     # Generate the masked language model output
-    with torch.no_grad():
+    with autocast():
         mask_token_index = torch.where(input == mask_token_id)[1]
 
-        # Run the model in fp16
-        token_logits = model(input)[0].float()  # Convert back to fp32 for further calculations
+        token_logits = model(input)[0]
 
         mask_token_logits = token_logits[0, mask_token_index, :]
         top_5_tokens = torch.topk(mask_token_logits, 5, dim=1).indices[0].tolist()
