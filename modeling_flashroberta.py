@@ -169,6 +169,9 @@ class FlashRobertaModel(RobertaModel):
         for attention_layer in self.encoder.layer:
             attention_layer.attention.self = FlashRobertaSelfAttention(config)
 
+        for idx, attention_layer in enumerate(self.encoder.layer):
+            print(f'{idx}: {attention_layer.attention.self.__class__.__name__}')
+
         # Initialize weights and apply final processing
         self.post_init()
 
