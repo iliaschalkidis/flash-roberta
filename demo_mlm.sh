@@ -7,6 +7,7 @@
 #SBATCH --time=0:20:00
 
 module load miniconda/4.12.0
+conda init bash
 conda activate kiddothe2b
 
 echo $SLURMD_NODENAME
