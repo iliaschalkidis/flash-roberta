@@ -88,7 +88,7 @@ class FlashRobertaSelfAttention(nn.Module):
             past_key_value = (key_layer, value_layer)
 
         # Flash Attention
-        attention_scores = flash_attn_func(query_layer, key_layer, value_layer, dropout_p=0.1,
+        attention_scores = flash_attn_func(query_layer, key_layer, value_layer, dropout_p=0.0,
                                            softmax_scale=None, causal=self.is_decoder)
 
         if self.position_embedding_type == "relative_key" or self.position_embedding_type == "relative_key_query":
