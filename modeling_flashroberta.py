@@ -166,7 +166,8 @@ class FlashRobertaModel(RobertaModel):
         super().__init__(config)
 
         # Replace legacy RobertaSelfAttention with FlashRobertaSelfAttention
-        self.encoder.layer.attention.self = [FlashRobertaSelfAttention(config) for _ in enumerate(self.encoder.layer)]
+        for attention_layer in self.encoder.layer:
+            attention_layer.attention.self = FlashRobertaSelfAttention(config)
 
         # Initialize weights and apply final processing
         self.post_init()
