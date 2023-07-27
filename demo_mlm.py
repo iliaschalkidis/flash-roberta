@@ -95,7 +95,7 @@ if __name__ == "__main__":
     precompiled_c4_subset = []
     for document in c4_subset:
         input_doc = tokenizer.encode(document['text'], return_tensors="pt", truncation=True).to(device)
-        if len(input_doc['input_ids']):
+        if len(input_doc['input_ids'][0]):
             precompiled_c4_subset.append(input_doc)
 
     demo_mlm(precompiled_c4_subset, args.model_class, args.model_path, len(precompiled_c4_subset))
