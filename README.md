@@ -31,3 +31,21 @@ from transformers import AutoModel, AutoTokenizer
 model = AutoModel.from_pretrained("kiddothe2b/flash-roberta-base", trust_remote_code=True)
 tokenizer = AutoTokenizer.from_pretrained("roberta-base")
 ```
+
+
+## Citation 
+
+```
+@misc{flashroberta,
+  title={Hugging Face RoBERTa with Flash Attention 2,
+  author={Chalkidis, Ilias},
+  year={2023},
+  howpublished={Hugging Face Hub}
+}
+
+@article{dao2023flashattention2,
+  title={Flash{A}ttention-2: Faster Attention with Better Parallelism and Work Partitioning,
+  author={Dao, Tri},
+  year={2023}
+}
+```

@@ -51,7 +51,7 @@ class FlashRobertaSelfAttention(nn.Module):
         context_layer, _, attention_probs = flash_attn_func(query_layer, key_layer, value_layer,
                                                             dropout_p=self.dropout_rate,
                                                             softmax_scale=None,
-                                                            causal=self.is_decoder,
+                                                            causal=False,
                                                             return_attn_probs=True)
 
         # Merge heads
