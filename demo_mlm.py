@@ -7,6 +7,7 @@ from datasets import load_dataset
 import time
 import re
 import random
+random.seed(42)
 
 
 def demo_mlm(corpus,
@@ -18,7 +19,9 @@ def demo_mlm(corpus,
     # Check if you have a GPU with CUDA support
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    # Load the model
+    # Load the model and tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    mask_token_id = torch.tensor(tokenizer.mask_token_id).to(device)
     if model_class == 'roberta':
         model = RobertaForMaskedLM.from_pretrained(model_path).to(device)
     elif model_class == 'flashroberta':
@@ -29,14 +32,18 @@ def demo_mlm(corpus,
 
     current_time = time.time()
     correct_predictions = 0
-    for input_doc, mask_token_id in corpus:
+    inf_avg_time = []
+    for input_doc in corpus:
         # Generate the masked language model output
         with autocast():
             mask_token_index = torch.where(input_doc == mask_token_id)[1]
+            inf_start_time = time.time()
             token_logits = model(input_doc)[0]
+            inf_avg_time.append(time.time() - inf_start_time)
             mask_token_logits = token_logits[0, mask_token_index, :]
             top_5_tokens = torch.topk(mask_token_logits, 5, dim=1).indices[0].tolist()
             correct_predictions += int(document['masked_word'] in tokenizer.decode(top_5_tokens))
+
 
             if log_predictions:
                 print(f'Top 5 tokens for model: {model.__class__.__name__}')
@@ -48,6 +55,7 @@ def demo_mlm(corpus,
     end_time = time.time() - current_time
     print(f'Model: {model.__class__.__name__}')
     print(f'Time taken for {model.__class__.__name__}: {end_time}')
+    print(f'Average inference time for {model.__class__.__name__}: {sum(inf_avg_time) / len(inf_avg_time):.3f}')
     print(f'Recall@5 for {model.__class__.__name__}: {correct_predictions / n_samples}')
 
 
@@ -83,10 +91,9 @@ if __name__ == "__main__":
     # Pre-encode C4 dataset
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     tokenizer = AutoTokenizer.from_pretrained(args.model_path)
-    mask_token_id = torch.tensor(tokenizer.mask_token_id).to(device)
     precompiled_c4_subset = []
     for document in c4_subset:
         input_doc = tokenizer.encode(document['text'], return_tensors="pt", truncation=True).to(device)
-        precompiled_c4_subset.append((input_doc, mask_token_id))
+        precompiled_c4_subset.append(input_doc)
 
     demo_mlm(precompiled_c4_subset, args.model_class, args.model_path, args.n_samples)
