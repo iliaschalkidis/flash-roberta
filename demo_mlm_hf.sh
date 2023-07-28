@@ -9,6 +9,7 @@
 module load miniconda/4.12.0
 conda init bash
 conda activate kiddothe2b
+TOKENIZERS_PARALLELISM=false
 
 MODEL_CLASS='roberta'
 MODEL_PATH='roberta-base'
