@@ -633,12 +633,15 @@ def main():
 
     # Evaluation
     if training_args.do_eval:
-        import time
+        import time, torch
         logger.info("*** Evaluate ***")
+        torch.cuda.reset_peak_memory_stats()
         start_time = time.time()
         metrics = trainer.evaluate()
         end_time = time.time()
+        memory_peak = torch.cuda.max_memory_allocated() / 1e9
         logger.info(f"Eval time: {end_time - start_time}")
+        logger.info(f"Peak memory: {memory_peak}GB")
         max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
         metrics["eval_samples"] = max_eval_samples
         try:

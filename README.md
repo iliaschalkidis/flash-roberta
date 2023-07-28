@@ -38,6 +38,38 @@ python demo_mlm.py --model_class flash-roberta --model_path roberta-base --datas
 
 ## Use with Hugging Face Transformers
 
+You can also use the standard Hugging Face language modeling `run_mlm.py` script:
+
+```
+sh demo_mlm.hf.sh
+```
+
+```
+RoBERTaForMaskedLM
+***** eval metrics *****
+  eval_accuracy           =     0.5758
+  eval_loss               =     3.0864
+  eval_runtime            = 0:00:11.01
+  eval_samples            =      10000
+  eval_samples_per_second =    908.235
+  eval_steps_per_second   =     28.428
+  perplexity              =     21.899
+Elapsed time: 39.611320195 seconds
+
+FlashRoBERTaForMaskedLM
+***** eval metrics *****
+  eval_accuracy           =     0.5714
+  eval_loss               =     3.0992
+  eval_runtime            = 0:00:08.45
+  eval_samples            =      10000
+  eval_samples_per_second =   1183.238
+  eval_steps_per_second   =     37.035
+  perplexity              =    22.1808
+```
+
+You can also use FlashRoBERTa directly from Hugging Face Transformers:
+
+
 ```python
 from transformers import AutoModel, AutoTokenizer
 
