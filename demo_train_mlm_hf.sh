@@ -23,6 +23,7 @@ start_time=$(date +%s.%N)
 python run_mlm.py \
     --model_class ${MODEL_CLASS} \
     --model_name_or_path ${MODEL_PATH} \
+    --overwrite_output_dir \
     --do_train \
     --do_eval \
     --dataset_name c4 \
@@ -32,6 +33,7 @@ python run_mlm.py \
     --evaluation_strategy steps \
     --eval_steps 10000 \
     --max_steps 10000 \
+    --per_device_train_batch_size 32 \
     --per_device_eval_batch_size 32 \
     --mlm_probability 0.15 \
     --max_seq_length 64 \
