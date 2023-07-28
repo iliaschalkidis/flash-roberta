@@ -557,7 +557,7 @@ def main():
             raise ValueError("--do_train requires a train dataset")
         train_dataset = tokenized_datasets["train"]
         if data_args.max_train_samples is not None:
-            max_train_samples =data_args.max_train_samples
+            max_train_samples = data_args.max_train_samples
             train_dataset = train_dataset.take(max_train_samples)
 
     if training_args.do_eval:
@@ -613,12 +613,19 @@ def main():
 
     # Training
     if training_args.do_train:
+        import torch, time
         checkpoint = None
         if training_args.resume_from_checkpoint is not None:
             checkpoint = training_args.resume_from_checkpoint
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
+        torch.cuda.reset_peak_memory_stats()
+        start_time = time.time()
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
+        end_time = time.time()
+        memory_peak = torch.cuda.max_memory_allocated() / 1e9
+        logger.info(f"Eval time: {end_time - start_time}")
+        logger.info(f"Peak memory: {memory_peak}GB")
         trainer.save_model()  # Saves the tokenizer too for easy upload
         metrics = train_result.metrics
 

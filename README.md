@@ -46,25 +46,34 @@ sh demo_mlm.hf.sh
 
 ```
 RoBERTaForMaskedLM
+---------------------------------------
+Eval time: 395.08065152168274
+Peak memory: 14.356424704GB
+---------------------------------------
 ***** eval metrics *****
-  eval_accuracy           =     0.5758
-  eval_loss               =     3.0864
-  eval_runtime            = 0:00:11.01
-  eval_samples            =      10000
-  eval_samples_per_second =    908.235
-  eval_steps_per_second   =     28.428
-  perplexity              =     21.899
-Elapsed time: 39.611320195 seconds
+  eval_accuracy           =     0.6667
+  eval_loss               =     2.0625
+  eval_runtime            = 0:06:30.23
+  eval_samples            =     100000
+  eval_samples_per_second =    256.257
+  eval_steps_per_second   =      4.005
+  perplexity              =     7.8655
+
+
 
 FlashRoBERTaForMaskedLM
+---------------------------------------
+Eval time: 296.4356851577759
+Peak memory: 14.35724544GB
+---------------------------------------
 ***** eval metrics *****
-  eval_accuracy           =     0.5714
-  eval_loss               =     3.0992
-  eval_runtime            = 0:00:08.45
-  eval_samples            =      10000
-  eval_samples_per_second =   1183.238
-  eval_steps_per_second   =     37.035
-  perplexity              =    22.1808
+  eval_accuracy           =     0.6629
+  eval_loss               =     2.0794
+  eval_runtime            = 0:04:51.75
+  eval_samples            =     100000
+  eval_samples_per_second =    342.749
+  eval_steps_per_second   =      5.357
+  perplexity              =        8.0
 ```
 
 You can also use FlashRoBERTa directly from Hugging Face Transformers:
