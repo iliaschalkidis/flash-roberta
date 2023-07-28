@@ -15,6 +15,19 @@ pip install -r requirements.txt
 ```bash
 sh demo_mlm.sh
 ```
+```
+Running inference...: 100%|██████████| 4329/4329 [00:53<00:00, 81.35it/s]
+Model: RobertaForMaskedLM
+Time taken for RobertaForMaskedLM: 53.21654486656189
+Average inference time for RobertaForMaskedLM: 0.011
+Recall@5 for RobertaForMaskedLM: 0.7251097251097252
+----------------------------------------
+Running inference...: 100%|██████████| 4329/4329 [00:45<00:00, 95.31it/s] 
+Model: FlashRobertaForMaskedLM
+Time taken for FlashRobertaForMaskedLM: 45.422065019607544
+Average inference time for FlashRobertaForMaskedLM: 0.009
+Recall@5 for FlashRobertaForMaskedLM: 0.7253407253407254
+```
 
 You can use any RoBERTa model from Hugging Face model hub and evaluate on any corpus. For example, to use `roberta-base` on `SST-2`:
 
