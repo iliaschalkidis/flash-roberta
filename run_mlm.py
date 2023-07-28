@@ -633,10 +633,12 @@ def main():
 
     # Evaluation
     if training_args.do_eval:
+        import time
         logger.info("*** Evaluate ***")
-
+        start_time = time.time()
         metrics = trainer.evaluate()
-
+        end_time = time.time()
+        logger.info(f"Eval time: {end_time - start_time}")
         max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
         metrics["eval_samples"] = max_eval_samples
         try:
