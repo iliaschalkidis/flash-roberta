@@ -1,6 +1,7 @@
 # Hugging Face RoBERTa with Flash Attention 2 :rocket:
 
 Re-implementation of Hugging Face :hugs: [RoBERTa](https://arxiv.org/abs/1907.11692) with [Flash Attention 2](https://tridao.me/publications/flash2/flash2.pdf) in PyTorch.  Drop-in replacement of Pytorch legacy Self-Attention with Flash Attention 2 for Hugging Face RoBERTa based on the standard implementation.
+FlashRoBERTa seems to be 20-30% faster compared to the vanilla RoBERTa across all benchmarks (training, inference), without any improvement in memory footprint.
 
 ## Installation
 
@@ -38,7 +39,7 @@ python demo_mlm.py --model_class flash-roberta --model_path roberta-base --datas
 
 ## Use with Hugging Face Transformers
 
-You can also use the standard Hugging Face language modeling `run_mlm.py` script:
+You can also use the standard Hugging Face language modeling `run_mlm.py` script for evaluation (inference):
 
 ```
 sh demo_mlm.hf.sh
@@ -74,6 +75,24 @@ Peak memory: 14.35724544GB
   eval_samples_per_second =    342.749
   eval_steps_per_second   =      5.357
   perplexity              =        8.0
+```
+
+Or training on any corpus:
+
+```
+RoBERTaForMaskedLM
+---------------------------------------
+{'eval_loss': 1.9818187952041626, 'eval_accuracy': 0.6163850658704041, 'eval_runtime': 7.7981, 'eval_samples_per_second': 1282.367, 'eval_steps_per_second': 40.138, 'epoch': 1.0}
+{'train_runtime': 669.4028, 'train_samples_per_second': 478.038, 'train_steps_per_second': 14.939, 'train_loss': 2.2284346923828124, 'epoch': 1.0}
+Eval time: 669.413816690445
+Peak memory: 4.309664768GB
+
+FlashRoBERTaForMaskedLM
+---------------------------------------
+{'eval_loss': 2.0119481086730957, 'eval_accuracy': 0.6122425376665159, 'eval_runtime': 5.8766, 'eval_samples_per_second': 1701.662, 'eval_steps_per_second': 53.262, 'epoch': 1.0}
+{'train_runtime': 551.3029, 'train_samples_per_second': 580.443, 'train_steps_per_second': 18.139, 'train_loss': 2.229952978515625, 'epoch': 1.0}
+Eval time: 551.3131585121155
+Peak memory: 4.16851456GB
 ```
 
 You can also use FlashRoBERTa directly from Hugging Face Transformers:
