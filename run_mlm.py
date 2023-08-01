@@ -423,7 +423,7 @@ def main():
     else:
         logger.info("Training new model from scratch")
         model = AutoModelForMaskedLM.from_config(config)
-
+    logger.info(f'Model: {model.__class__.__name__}')
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
     embedding_size = model.get_input_embeddings().weight.shape[0]
@@ -613,7 +613,8 @@ def main():
 
     # Training
     if training_args.do_train:
-        import torch, time
+        import time, torch
+        logger.info("*** Train ***")
         checkpoint = None
         if training_args.resume_from_checkpoint is not None:
             checkpoint = training_args.resume_from_checkpoint
@@ -623,8 +624,8 @@ def main():
         start_time = time.time()
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         end_time = time.time()
+        logger.info(f"Train time: {end_time - start_time}")
         memory_peak = torch.cuda.max_memory_allocated() / 1e9
-        logger.info(f"Eval time: {end_time - start_time}")
         logger.info(f"Peak memory: {memory_peak}GB")
         trainer.save_model()  # Saves the tokenizer too for easy upload
         metrics = train_result.metrics
@@ -644,8 +645,8 @@ def main():
         start_time = time.time()
         metrics = trainer.evaluate()
         end_time = time.time()
-        memory_peak = torch.cuda.max_memory_allocated() / 1e9
         logger.info(f"Eval time: {end_time - start_time}")
+        memory_peak = torch.cuda.max_memory_allocated() / 1e9
         logger.info(f"Peak memory: {memory_peak}GB")
         max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
         metrics["eval_samples"] = max_eval_samples
